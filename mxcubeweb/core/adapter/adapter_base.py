@@ -11,6 +11,7 @@ from pydantic.v1 import (
     create_model,
 )
 
+from mxcubeweb.core.adapter.resource_handler import AdapterResourceHandler
 from mxcubeweb.core.models.adaptermodels import (
     HOActuatorModel,
     HOModel,
@@ -24,7 +25,10 @@ class AdapterBase:
     ATTRIBUTES = []
     METHODS = []
 
-    def __init__(self, ho, role, app):
+    ADAPTER_REGISTRY = {}
+    RESOURCE_HANDLER_DICT = {}
+
+    def __init__(self, ho, role, app, resource_handler_config=None):
         """
         Args:
             (object): Hardware object to mediate for.
@@ -38,6 +42,32 @@ class AdapterBase:
         self._type = type(self).__name__.replace("Adapter", "").upper()
         self._unique = True
         self._msg = ""
+
+        cls_name = self.__class__.__name__
+
+        if not cls_name in self.ADAPTER_REGISTRY:
+            self.ADAPTER_REGISTRY[cls_name] = {}
+
+        if ho is not None:
+            self.ADAPTER_REGISTRY[cls_name][ho.name()[1:]] = self
+
+        if not cls_name in self.RESOURCE_HANDLER_DICT and resource_handler_config:
+            self.RESOURCE_HANDLER_DICT[cls_name] = AdapterResourceHandler(
+                name=resource_handler_config.name,
+                url_prefix=resource_handler_config.url_prefix,
+                adapter_dict=self.ADAPTER_REGISTRY[self.__class__.__name__],
+                app=self.app,
+                exports=resource_handler_config.exports,
+                commands=resource_handler_config.commands,
+                attributes=resource_handler_config.attributes,
+            )
+
+        print(AdapterBase.ADAPTER_REGISTRY)
+        print(AdapterBase.RESOURCE_HANDLER_DICT)
+
+    @classmethod
+    def get_resource_handler(cls):
+        return AdapterBase.RESOURCE_HANDLER_DICT.get(cls.__name__, None)
 
     def get_adapter_id(self, ho=None):
         ho = self._ho if not ho else ho

@@ -18,7 +18,6 @@ def create_get_route(app, server, bp, adapter, attr):
     model = adapter._model_from_typehint(getattr(adapter, attr, None))
 
     @server.restrict
-    @server.validate(json=model["args"])
     def get_func(name):
         try:
             args = request.get_json()
@@ -50,7 +49,6 @@ def create_set_route(app, server, bp, adapter, attr, name):
         @bp.route(route_url, endpoint=endpoint, methods=["PUT"])
         @server.require_control
         @server.restrict
-        @server.validate(json=set_type_hint["value"])
         def set_func(name, _th=set_type_hint):
             """
             Tries to set < name > to value
@@ -76,7 +74,6 @@ def create_route(app, server, bp, adapter, obj, cmd_name):
     @bp.route(route_url, endpoint=cmd_name, methods=["POST"])
     @server.require_control
     @server.restrict
-    @server.validate(json=arg_schema)
     def set_func():
         """
         Tries to set < name > to value
@@ -132,12 +129,12 @@ def init_route(app, server, url_prefix):
 
     add_adapter_routes(app, server, bp)
 
-    @bp.route("/", methods=["GET"])
+    @bp.get("/")
     @server.restrict
     def beamline_get_all_attributes():
         return jsonify(app.beamline.beamline_get_all_attributes())
 
-    @bp.route("/<name>/abort", methods=["GET"])
+    @bp.get("/<name>/abort")
     @server.require_control
     @server.restrict
     def beamline_abort_action(name):

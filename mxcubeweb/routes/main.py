@@ -10,7 +10,6 @@ from flask import (
     request,
 )
 from mxcubecore import HardwareRepository as HWR
-from spectree import Response
 
 from mxcubeweb import __version__
 from mxcubeweb.core.models.configmodels import UIPropertiesListModel
@@ -39,13 +38,11 @@ def init_route(app, server, url_prefix):
 
     @bp.route("/uiproperties")
     @server.restrict
-    @server.validate(resp=Response(HTTP_200=UIPropertiesListModel))
     def get_ui_properties():
         return app.get_ui_properties()
 
     @bp.route("/application_settings")
     @server.restrict
-    @server.validate(resp=Response(HTTP_200=AppSettingsModel))
     def mxcube_mode():
         return jsonify(
             {

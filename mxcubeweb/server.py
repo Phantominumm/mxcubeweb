@@ -91,15 +91,6 @@ class Server:
         )
         Server.flask_socketio.init_app(Server.flask)
 
-        Server.api = SpecTree(
-            "flask",
-            app=Server.flask,
-            title="MXCuBE Web api",
-            version="v1.0",
-            annotations=True,
-        )
-        Server.validate = Server.api.validate
-
         # the following test prevents Flask from initializing twice
         # (because of the Reloader)
         if not Server.flask.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
@@ -116,13 +107,14 @@ class Server:
 
     def _register_route(init_blueprint_fn, app, url_prefix):
         bp = init_blueprint_fn(app, Server, url_prefix)
-
         Server.flask.register_blueprint(bp)
 
         for key, function in Server.flask.view_functions.items():
             if key.startswith(bp.name):
                 if not hasattr(function, "tags"):
                     function.tags = [bp.name.title().replace("_", " ")]
+
+        return bp
 
     @staticmethod
     def register_routes(mxcube):
@@ -151,7 +143,7 @@ class Server:
 
         url_root_prefix = "/mxcube/api/v0.1"
 
-        Server._register_route(
+        blbp = Server._register_route(
             init_beamline_route, mxcube, f"{url_root_prefix}/beamline"
         )
 
@@ -198,6 +190,18 @@ class Server:
         Server._register_route(
             init_harvester_route, mxcube, f"{url_root_prefix}/harvester"
         )
+
+        from mxcubeweb.core.adapter.motor_adapter import MotorAdapter
+
+        adapter_cls_list = []
+        for name, adapter_data in mxcube.mxcubecore.adapter_dict.items():
+            adapter_cls = adapter_data["adapter"].__class__
+            if not adapter_cls in adapter_cls_list:
+                adapter_cls_list.append(adapter_cls)
+                rh = adapter_cls.get_resource_handler()
+
+                if rh:
+                    rh.register_blueprint(Server.flask)
 
         Server.security = flask_security.Security(Server.flask, Server.user_datastore)
 
