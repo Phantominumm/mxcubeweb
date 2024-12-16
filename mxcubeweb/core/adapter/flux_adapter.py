@@ -25,10 +25,10 @@ class FluxAdapter(ActuatorAdapterBase):
         value = "{:.2E}".format(Decimal(self._ho.get_value()))
         self.value_change(value, **kwargs)
 
-    def _set_value(self, value=None):
+    def set_value(self, value=None):
         """Read only"""
 
-    def _get_value(self):
+    def get_value(self):
         """
         Get the photon flux.
         Returns:

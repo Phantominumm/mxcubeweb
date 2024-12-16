@@ -10,6 +10,8 @@ import time
 import mxcubecore
 import pytest
 
+from fixture import client
+
 import mxcubeweb
 
 URL_BASE = "/mxcube/api/v0.1/login"
@@ -26,7 +28,6 @@ CREDENTIALS_1 = {"proposal": "idtest1", "password": "sUpErSaFe"}
 SESSION_LIFETIME = 2.0  # seconds
 
 USER_DB_PATH = "/tmp/mxcube-test-user.db"
-
 
 @pytest.fixture(params=["proposal", "user"])
 def login_type(request):

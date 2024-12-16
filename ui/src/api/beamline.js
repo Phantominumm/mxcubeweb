@@ -14,16 +14,22 @@ export function sendPrepareBeamlineForNewSample() {
   return endpoint.put(undefined, '/prepare_beamline').res();
 }
 
-export function sendExecuteCommand(obj, name, args) {
-  return endpoint.post(args, `/${obj}/command/${name}`).res();
+export function sendExecuteCommand(object_type, object_id, command, args) {
+  return api
+    .url('/hwobj')
+    .put({ args }, `/${object_type}/${object_id}/${command}`)
+    .res();
 }
 
-export function sendSetAttribute(name, type, value) {
-  return endpoint.put({ name, value }, `/${type}/value/${name}`).res();
+export function sendSetAttribute(object_id, type, value) {
+  return api
+    .url('/hwobj')
+    .put({ value }, `/${type}/${object_id}/set_value`)
+    .res();
 }
 
-export function sendGetAttribute(type, name, attr, args) {
-  return endpoint.post(args, `/${type}/${name}/${attr}`).safeJson();
+export function sendGetAttribute(object_id, type) {
+  return api.url('/hwobj').put({}, `/${type}/${object_id}/get_value`).res();
 }
 
 export function sendRunBeamlineAction(name, parameters) {

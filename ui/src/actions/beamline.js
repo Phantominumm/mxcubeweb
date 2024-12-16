@@ -47,9 +47,9 @@ export function setAttribute(name, value) {
   };
 }
 
-export function executeCommand(obj, name, args) {
+export function executeCommand(object_type, object_id, name, args) {
   return () => {
-    sendExecuteCommand(obj, name, args);
+    sendExecuteCommand(object_type, object_id, name, args);
   };
 }
 

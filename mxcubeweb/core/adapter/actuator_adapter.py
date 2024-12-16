@@ -10,6 +10,13 @@ from mxcubeweb.core.models.adaptermodels import (
 from mxcubeweb.core.util.networkutils import RateLimited
 
 
+from mxcubeweb.core.models.configmodels import AdapterResourceHandlerConfigModel
+
+resource_handler_config = AdapterResourceHandlerConfigModel( 
+    commands=["get_value", "set_value"],
+    attributes=["data"]
+)
+
 class ActuatorAdapter(ActuatorAdapterBase):
     """
     Adapter for Energy Hardware Object, a web socket is used to communicate
@@ -23,7 +30,7 @@ class ActuatorAdapter(ActuatorAdapterBase):
         Args:
             (object): Hardware object.
         """
-        super().__init__(ho, *args)
+        super(ActuatorAdapter, self).__init__(ho, role, app, resource_handler_config)
         self._event_rate = 4
 
         @RateLimited(self._event_rate)
@@ -41,7 +48,7 @@ class ActuatorAdapter(ActuatorAdapterBase):
     def _value_change(self, *args, **kwargs):
         self._vc(*args, **kwargs)
 
-    def _set_value(self, value: HOActuatorValueChangeModel):
+    def set_value(self, value: HOActuatorValueChangeModel):
         """
         Execute the sequence to set the value.
         Args:
@@ -55,7 +62,7 @@ class ActuatorAdapter(ActuatorAdapterBase):
         """
         self._ho.set_value(float(value.value))
 
-    def _get_value(self) -> FloatValueModel:
+    def get_value(self) -> FloatValueModel:
         """
         Read the energy.
         Returns:

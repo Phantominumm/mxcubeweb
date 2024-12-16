@@ -24,6 +24,8 @@ from mxcubeweb.core.models.usermodels import (
 )
 from mxcubeweb.core.util import networkutils
 
+from mxcubeweb.core.server.resource_handler import AdapterResourceHandlerFactory
+
 
 class Server:
     init_event = gevent.event.Event()
@@ -71,15 +73,6 @@ class Server:
         )
         Server.flask_socketio.init_app(Server.flask)
 
-        Server.api = SpecTree(
-            "flask",
-            app=Server.flask,
-            title="MXCuBE Web api",
-            version="v1.0",
-            annotations=True,
-        )
-        Server.validate = Server.api.validate
-
         # the following test prevents Flask from initializing twice
         # (because of the Reloader)
         if not Server.flask.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
@@ -91,12 +84,13 @@ class Server:
 
     def _register_route(init_blueprint_fn, app, url_prefix):
         bp = init_blueprint_fn(app, Server, url_prefix)
-
         Server.flask.register_blueprint(bp)
 
         for key, function in Server.flask.view_functions.items():
             if key.startswith(bp.name) and not hasattr(function, "tags"):
                 function.tags = [bp.name.title().replace("_", " ")]
+
+        return bp
 
     @staticmethod
     def register_routes(mxcube):
@@ -173,7 +167,9 @@ class Server:
             init_harvester_route, mxcube, f"{url_root_prefix}/harvester"
         )
 
-        Server.security = flask_security.Security(Server.flask, Server.user_datastore)
+        AdapterResourceHandlerFactory.register_with_server(
+            Server.flask
+        )
 
     @staticmethod
     def emit(*args, **kwargs):
