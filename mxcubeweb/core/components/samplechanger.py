@@ -284,10 +284,7 @@ class SampleChanger(ComponentBase):
             HWR.beamline.sample_view.clear_all()
 
     def mount_sample(self, sample):
-        gevent.spawn(self.mount_sample_clean_up, sample)
-        sc = HWR.beamline.sample_changer
-
-        if not sc.is_ready():
+        if not HWR.beamline.sample_changer.is_ready():
             raise Exception("Sample changer is busy, the sample can not be loaded.")
         else:
             gevent.spawn(self.mount_sample_clean_up, sample)
