@@ -6,10 +6,11 @@ def export(func):
 
 
 def get_adapter_cls_from_hardware_object(ho):
-    # This needs to be a direct import of DataPublisher otherwise the
+    # This needs to be a direct import of Argus/DataPublisher otherwise the
     # is instance check below fails due to different "import paths" It
-    # inly works because mxcubecore adds mxcubecore.HardwareObjects to
+    # only works because mxcubecore adds mxcubecore.HardwareObjects to
     # sys path in __init__.py
+    import Argus
     import DataPublisher
     from mxcubecore.HardwareObjects import (
         GenericDiffractometer,
@@ -27,6 +28,7 @@ def get_adapter_cls_from_hardware_object(ho):
     )
 
     from mxcubeweb.core.adapter.actuator_adapter import ActuatorAdapter
+    from mxcubeweb.core.adapter.argus_adapter import ArgusAdapter
     from mxcubeweb.core.adapter.beam_adapter import BeamAdapter
     from mxcubeweb.core.adapter.data_publisher_adapter import DataPublisherAdapter
     from mxcubeweb.core.adapter.detector_adapter import DetectorAdapter
@@ -36,22 +38,27 @@ def get_adapter_cls_from_hardware_object(ho):
     from mxcubeweb.core.adapter.motor_adapter import MotorAdapter
     from mxcubeweb.core.adapter.nstate_adapter import NStateAdapter
 
-    if isinstance(ho, AbstractNState.AbstractNState | AbstractShutter.AbstractShutter):
-        return NStateAdapter
-    if isinstance(ho, MiniDiff.MiniDiff | GenericDiffractometer.GenericDiffractometer):
-        return DiffractometerAdapter
-    if isinstance(ho, AbstractEnergy.AbstractEnergy):
-        return EnergyAdapter
-    if isinstance(ho, AbstractDetector.AbstractDetector):
-        return DetectorAdapter
-    if isinstance(ho, AbstractMachineInfo.AbstractMachineInfo):
-        return MachineInfoAdapter
-    if isinstance(ho, AbstractBeam.AbstractBeam):
-        return BeamAdapter
-    if isinstance(ho, DataPublisher.DataPublisher):
-        return DataPublisherAdapter
-    if isinstance(ho, AbstractMotor.AbstractMotor):
-        return MotorAdapter
-    if isinstance(ho, AbstractActuator.AbstractActuator):
-        return ActuatorAdapter
-    return None
+    adapter_mapping = {
+        (AbstractNState.AbstractNState, AbstractShutter.AbstractShutter): NStateAdapter,
+        (
+            MiniDiff.MiniDiff,
+            GenericDiffractometer.GenericDiffractometer,
+        ): DiffractometerAdapter,
+        (AbstractEnergy.AbstractEnergy,): EnergyAdapter,
+        (AbstractDetector.AbstractDetector,): DetectorAdapter,
+        (AbstractMachineInfo.AbstractMachineInfo,): MachineInfoAdapter,
+        (AbstractBeam.AbstractBeam,): BeamAdapter,
+        (DataPublisher.DataPublisher,): DataPublisherAdapter,
+        (AbstractMotor.AbstractMotor,): MotorAdapter,
+        (AbstractActuator.AbstractActuator,): ActuatorAdapter,
+        (Argus.Argus,): ArgusAdapter,
+    }
+
+    return next(
+        (
+            adapter
+            for classes, adapter in adapter_mapping.items()
+            if isinstance(ho, classes)
+        ),
+        None,
+    )
