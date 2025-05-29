@@ -411,6 +411,11 @@ export default class SampleImage extends React.Component {
 
         if (threeDpointList.length === 2) {
           ctxMenuObj = { type: 'HELICAL', id: this.props.selectedShapes };
+        } else if (twoDPointList.length === 2) {
+          ctxMenuObj = {
+            type: 'POINTS_PAIR_2D',
+            id: this.props.selectedShapes,
+          };
         } else if (
           threeDpointList.length === 1 &&
           this.props.points[threeDpointList[0]].state === 'SAVED'
