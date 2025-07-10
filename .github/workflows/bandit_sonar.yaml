@@ -8,13 +8,13 @@ name: Bandit and SonarQube
     - cron: '30 7 * * 3'
   workflow_dispatch: true
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   bandit:
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
