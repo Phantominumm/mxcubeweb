@@ -1,13 +1,14 @@
 ---
 name: Bandit and SonarQube
-on:
+
+"on":
   push:
-    branches: [ "develop", "master" ]
+    branches: ["develop"]
   pull_request:
-    branches: [ "develop" ]
+    branches: ["develop"]
   schedule:
     - cron: '30 7 * * 3'
-  workflow_dispatch:
+  workflow_dispatch: true
 
 jobs:
   bandit:
@@ -49,7 +50,8 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          organization: mxcube-tes
-          projectKey: Phantominumm_mxcubeweb
+          args: >
+            -Dsonar.organization=mxcube-tes
+            -Dsonar.projectKey=Phantominumm_mxcubeweb
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
