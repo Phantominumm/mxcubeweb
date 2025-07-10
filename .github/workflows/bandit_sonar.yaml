@@ -2,9 +2,9 @@
 name: Bandit and SonarQube
 on:
   push:
-    branches: [ "develop", "master" ]
+    branches: ["develop"]
   pull_request:
-    branches: [ "develop" ]
+    branches: ["develop"]
   schedule:
     - cron: '30 7 * * 3'
   workflow_dispatch:
