@@ -1,12 +1,14 @@
 ---
+# yamllint disable rule:line-length
+
 name: Bandit and SonarQube
 
 "on":
-  push: null
   pull_request: null
+  push: null
   schedule:
     - cron: '30 7 * * 3'
-  workflow_dispatch: true
+  workflow_dispatch: null
 
 permissions:
   contents: read
