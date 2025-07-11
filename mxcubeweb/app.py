@@ -332,5 +332,5 @@ class MXCUBEApplication:
 
 
 def test_vulnerability():
-    password = "SuperSecret123"  # nosec
+    password = "SuperSecret123"  
     print("This is a test password:", password)
