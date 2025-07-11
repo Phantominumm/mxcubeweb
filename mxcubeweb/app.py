@@ -329,3 +329,8 @@ class MXCUBEApplication:
             ) in MXCUBEApplication.CONFIG.app.ui_properties
             if value
         }
+
+
+def test_vulnerability():
+    password = "SuperSecret123"  # nosec
+    print("This is a test password:", password)
