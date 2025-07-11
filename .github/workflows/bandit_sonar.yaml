@@ -26,8 +26,8 @@ jobs:
           exit_zero: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           excluded_paths: ./test/
-          level: LOW
-          confidence: LOW
+          level: MEDIUM
+          confidence: HIGH
 
       - name: Upload SARIF file to GitHub
         uses: github/codeql-action/upload-sarif@v3
