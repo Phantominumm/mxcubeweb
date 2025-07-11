@@ -33,6 +33,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
+          category: bandit
 
   sonarcloud:
     name: SonarCloud Scan
@@ -60,4 +61,3 @@ jobs:
             -Dsonar.projectKey=Phantominumm_mxcubeweb
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
